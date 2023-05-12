@@ -2,7 +2,7 @@ from pathlib import Path
 import glm
 import moderngl_window as mglw
 from moderngl_window.opengl.vao import VAO
-from geometry import Sphere
+from sphere import Sphere
 
 class Window(mglw.WindowConfig):
 
@@ -20,10 +20,10 @@ class Window(mglw.WindowConfig):
             fragment_shader="shaders/default.frag",
         )
 
-        self.sphere = Sphere(depth = 5)
+        sphere = Sphere(6)
 
-        self.vao = VAO("sphere", mode = self.ctx.POINTS)
-        self.vao.buffer(self.sphere.vertices, "3f", "in_vert")
+        self.vao = VAO(mode = self.ctx.POINTS)
+        self.vao.buffer(sphere.vertices, "3f", ["in_vert"])
 
         self.program["perspective"].write(
             glm.perspective(
@@ -36,6 +36,8 @@ class Window(mglw.WindowConfig):
 
     def render(self, time, frametime):
         self.ctx.clear()
+
+        self.ctx.enable(self.ctx.DEPTH_TEST)
 
         self.program["model"].write(
             glm.rotate(
