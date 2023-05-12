@@ -1,9 +1,11 @@
 import numpy as np
+import glm
 
 class Sphere:
 
-    def __init__(self, depth: int):
-        self.depth = depth
+    def __init__(self, color: glm.vec3, depth: int):
+        self._depth = depth
+        self._color = color;
         self._generate_vertices()
 
     def _generate_vertices(self):
@@ -28,9 +30,7 @@ class Sphere:
             (v5, v4, v6),
             (v5, v3, v4)
         ]:
-            self._generate_triangle(*triangle, self.depth)
-
-        self._vertices = np.array(self._vertices, dtype = np.float32)
+            self._generate_triangle(*triangle, self._depth)
 
     def _generate_triangle(
         self,
@@ -67,5 +67,9 @@ class Sphere:
 
     @property
     def vertices(self) -> np.ndarray:
-        return self._vertices
+        return np.array(self._vertices, dtype = np.float32)
+
+    @property
+    def color(self) -> glm.vec3:
+        return glm.vec3(self._color)
 

@@ -20,10 +20,13 @@ class Window(mglw.WindowConfig):
             fragment_shader="shaders/default.frag",
         )
 
-        sphere = Sphere(depth = 4)
+        self.sphere = Sphere(
+            color = (1.0, 1.0, 0.0),
+            depth = 3
+        )
 
         self.vao = VAO(mode = self.ctx.POINTS)
-        self.vao.buffer(sphere.vertices, "3f", ["in_vert"])
+        self.vao.buffer(self.sphere.vertices, "3f", ["in_vert"])
 
         self.program["perspective"].write(
             glm.perspective(
@@ -46,6 +49,8 @@ class Window(mglw.WindowConfig):
                 glm.vec3(0, 1, 0)
             )
         )
+
+        self.program["color"].write(self.sphere.color)
 
         self.program["view"].write(
             glm.lookAt(
