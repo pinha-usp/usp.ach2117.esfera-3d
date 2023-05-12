@@ -20,7 +20,7 @@ class Window(mglw.WindowConfig):
             fragment_shader="shaders/default.frag",
         )
 
-        sphere = Sphere(6)
+        sphere = Sphere(depth = 4)
 
         self.vao = VAO(mode = self.ctx.POINTS)
         self.vao.buffer(sphere.vertices, "3f", ["in_vert"])
