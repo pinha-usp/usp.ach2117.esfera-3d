@@ -1,8 +1,12 @@
 from pathlib import Path
+
 import glm
 import moderngl_window as mglw
 from moderngl_window.opengl.vao import VAO
+
+from mesh import Mesh
 from sphere import Sphere
+from loader import ProgramLoader
 
 class Window(mglw.WindowConfig):
 
@@ -15,26 +19,39 @@ class Window(mglw.WindowConfig):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.program = self.load_program(
-            vertex_shader="shaders/default.vert",
-            fragment_shader="shaders/default.frag",
+        self.mesh = Mesh(
+            program = ProgramLoader.load(
+                both = "default"
+            ),
+
+            shape = Sphere(
+                depth = 4,
+                color = (0.0, 1.0, 0.0)
+            ),
         )
 
-        self.sphere = Sphere(
-            color = (1.0, 1.0, 0.0),
-            depth = 3
+        self.mesh2 = Mesh(
+            program = ProgramLoader.load(
+                both = "default"
+            ),
+
+            shape = Sphere(
+                depth = 4,
+                color = (1.0, 1.0, 0.0)
+            ),
         )
 
-        self.vao = VAO(mode = self.ctx.POINTS)
-        self.vao.buffer(self.sphere.vertices, "3f", ["in_vert"])
+        self.projection = glm.perspective(
+            glm.radians(45),
+            1.0,
+            0.1,
+            100.0
+        )
 
-        self.program["perspective"].write(
-            glm.perspective(
-                glm.radians(45),
-                1.0,
-                0.1,
-                100.0
-            )
+        self.view = glm.lookAt(
+            glm.vec3(0, 0, 50),
+            glm.vec3(0, 0, 0),
+            glm.vec3(0, 1, 0)
         )
 
     def render(self, time, frametime):
@@ -42,22 +59,27 @@ class Window(mglw.WindowConfig):
 
         self.ctx.enable(self.ctx.DEPTH_TEST)
 
-        self.program["model"].write(
-            glm.rotate(
-                glm.mat4(1.0),
-                glm.radians(time * 45),
-                glm.vec3(0, 1, 0)
-            )
+        (
+            self.mesh
+            .translate((10 * glm.sin(time), 0, 10 * glm.cos(time)))
+            .rotate(time * -90, (1, 1, 0))
         )
 
-        self.program["color"].write(self.sphere.color)
-
-        self.program["view"].write(
-            glm.lookAt(
-                glm.vec3(2, 2, 2),
-                glm.vec3(0, 0, 0),
-                glm.vec3(0, 1, 0)
-            )
+        (
+            self.mesh2
+            .scale((3.0, 3.0, 3.0))
+            .rotate(time * -90, (1, 1, 0))
         )
 
-        self.vao.render(self.program)
+        self.mesh.draw(
+            view = self.view,
+            projection = self.projection
+        )
+
+        self.mesh2.draw(
+            view = self.view,
+            projection = self.projection
+        )
+
+        self.mesh.reset()
+        self.mesh2.reset()
